@@ -1,10 +1,7 @@
 # CSC3106 Mini-Project - Authentication Log Analysis and Defensive Response
 Group BM
 
-Neo Sun Wei
-Soh Jian Ping
-Gerald Tan Hau Qing 
-Jiong Xiang Ethan Ng 
+Neo Sun Wei, Soh Jian Ping, Gerald Tan Hau Qing, Jiong Xiang Ethan Ng 
 
 
 This folder contains the reproducibility package for both parts of the mini-project: the Part 1 analysis script, the Part 2 detection/response script, their generated outputs, and this README.
