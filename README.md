@@ -84,7 +84,7 @@ The log uses syslog-style `Mon DD HH:MM:SS` timestamps with no year. The script 
 Any line whose message body doesn't match a known template is written verbatim with its line number to `output/unmatched_lines.csv` for manual review. On the assigned extract this file is currently empty (all 12,000 lines matched a known template), which is itself worth noting as a characteristic of this synthetic dataset.
 
 5. **Accounts flagged as higher-priority evidence.** 
-All six accounts that ever had a successful login (`alice`, `ops`, `backup`, `mei`, `dinesh`, `postgres`) were also targeted by failed password attempt at some point in the extract  `accounts_targeted_and_later_accepted.csv`). This overlap is presented as supporting evidence only as it does not by itself prove a successful compromise, since the failed and accepted attempts may originate from different, unrelated source IPs.
+All six accounts that ever had a successful login (`alice`, `ops`, `backup`, `mei`, `dinesh`, `postgres`) were also targeted by failed password attempt at some point in the extract  (`accounts_targeted_and_later_accepted.csv`). This overlap is presented as supporting evidence only as it does not by itself prove a successful compromise, since the failed and accepted attempts may originate from different, unrelated source IPs.
 
 ## Limitations
 

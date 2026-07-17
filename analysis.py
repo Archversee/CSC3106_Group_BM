@@ -7,10 +7,7 @@ from pathlib import Path
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# ---------------------------------------------------------------------
 # Regex patterns
-# ---------------------------------------------------------------------
-
 # Generic syslog-style line prefix: "Jul 06 00:02:36 db01 sshd[3907]: <msg>"
 LINE_RE = re.compile(
     r"^(?P<month>\w{3})\s+(?P<day>\d{1,2})\s+(?P<time>\d{2}:\d{2}:\d{2})\s+"
@@ -56,13 +53,6 @@ MONTHS = {
 
 
 def parse_log(path: Path):
-    """Parse the raw log file into a list of structured event dicts.
-
-    Returns (events, unmatched) where `events` is a list of dicts with
-    at least keys {line_no, timestamp, proc, event_type, user, ip} and
-    `unmatched` is a list of (line_no, raw_line) for lines whose
-    message body did not match any known template.
-    """
     events = []
     unmatched = []
 
@@ -83,9 +73,7 @@ def parse_log(path: Path):
             proc = m.group("proc")
             msg = m.group("msg")
 
-            # Assume all events fall in a single year (not present in
-            # syslog-style timestamps); we keep month/day/time as given
-            # and build a sortable string using a fixed placeholder year.
+            # Assume all events fall in a single year
             timestamp = f"2026-{month:02d}-{day:02d} {time_str}" if month else None
 
             matched_type = None
@@ -145,22 +133,17 @@ def main():
     events, unmatched = parse_log(in_path)
     df = build_dataframe(events)
 
-    # -------------------------------------------------------------
-    # 1. Unmatched / ambiguous lines -> written for transparency
-    # -------------------------------------------------------------
+    # 1. Unmatched / ambiguous lines for transparency
     write_csv(unmatched, out_dir / "unmatched_lines.csv", ["line_no", "raw_line"])
 
-    # -------------------------------------------------------------
-    # 2. Failed authentication attempts (canonical definition, see
-    #    module docstring point 2)
-    # -------------------------------------------------------------
+    # 2. Failed authentication attempts
     failed = df[df["event_type"].isin(["failed_password_valid", "failed_password_invalid"])].copy()
     failed["target_type"] = failed["event_type"].map({
         "failed_password_valid": "existing_or_unknown_account",
         "failed_password_invalid": "invalid_account",
     })
 
-    # Top source IPs by failed attempts (REQUIRED visualisation)
+    # Top source IPs by failed attempts
     top_ips = failed["ip"].value_counts().head(10)
     write_csv(
         list(top_ips.items()),
@@ -177,7 +160,7 @@ def main():
     plt.savefig(figures_dir / "top_source_ips_failed.png", dpi=150)
     plt.close()
 
-    # Top targeted usernames in failed attempts (second visualisation)
+    # Top targeted usernames in failed attempts
     top_users = failed["user"].value_counts().head(10)
     write_csv(
         list(top_users.items()),
@@ -194,7 +177,7 @@ def main():
     plt.savefig(figures_dir / "top_targeted_usernames.png", dpi=150)
     plt.close()
 
-    # Failed attempts over time (supporting visualisation)
+    # Failed attempts over time
     if not failed.empty and failed["timestamp"].notna().any():
         by_day = failed.dropna(subset=["timestamp"]).set_index("timestamp").resample("D").size()
         write_csv(
@@ -211,9 +194,7 @@ def main():
         plt.savefig(figures_dir / "failed_attempts_by_day.png", dpi=150)
         plt.close()
 
-    # -------------------------------------------------------------
     # 3. Successful logins
-    # -------------------------------------------------------------
     accepted = df[df["event_type"] == "accepted_password"].copy()
     accepted_by_user = accepted["user"].value_counts()
     write_csv(
@@ -228,8 +209,7 @@ def main():
         ["source_ip", "accepted_logins"],
     )
 
-    # Accounts that were both brute-forced (failed) AND later had a
-    # successful login -- higher-priority evidence of possible compromise.
+    # Accounts that failed and later had a successful login
     failed_targets = set(failed["user"].dropna())
     accepted_users = set(accepted["user"].dropna())
     overlap = sorted(failed_targets & accepted_users)
@@ -239,9 +219,7 @@ def main():
         ["username"],
     )
 
-    # -------------------------------------------------------------
     # 4. Brute-force / lockout indicators per source IP
-    # -------------------------------------------------------------
     max_auth = df[df["event_type"] == "max_auth_exceeded"]
     max_auth_by_ip = max_auth["ip"].value_counts()
     write_csv(
@@ -258,9 +236,7 @@ def main():
         ["source_ip", "count"],
     )
 
-    # -------------------------------------------------------------
     # 5. Privileged activity (sudo) per user
-    # -------------------------------------------------------------
     sudo = df[df["event_type"] == "sudo_command"]
     sudo_by_user = sudo["user"].value_counts()
     write_csv(
@@ -269,19 +245,17 @@ def main():
         ["username", "sudo_command_count"],
     )
 
-    # -------------------------------------------------------------
     # 6. Console summary
-    # -------------------------------------------------------------
     print("=" * 60)
     print(f"Parsed {len(df)} matched events, {len(unmatched)} unmatched lines")
     print(f"Total failed authentication attempts: {len(failed)}")
-    print(f"Total accepted (successful) logins:    {len(accepted)}")
+    print(f"Total accepted (successful) logins: {len(accepted)}")
     print(f"Distinct source IPs (failed attempts): {failed['ip'].nunique()}")
-    print(f"Distinct usernames targeted (failed):  {failed['user'].nunique()}")
+    print(f"Distinct usernames targeted (failed): {failed['user'].nunique()}")
     print(f"'max authentication attempts exceeded' events: {len(max_auth)}")
     print(f"Preauth connections closed: {len(preauth)}")
     print(f"Sudo commands run: {len(sudo)}")
-    print(f"Accounts both targeted by failures AND later accepted: {len(overlap)} -> {overlap}")
+    print(f"Accounts both targeted by failures AND later accepted: {len(overlap)} - {overlap}")
     print("-" * 60)
     print("Top 5 source IPs by failed attempts:")
     print(top_ips.head(5).to_string())
