@@ -1,4 +1,11 @@
 # CSC3106 Mini-Project - Authentication Log Analysis and Defensive Response
+Group BM
+
+Neo Sun Wei
+Soh Jian Ping
+Gerald Tan Hau Qing 
+Jiong Xiang Ethan Ng 
+
 
 This folder contains the reproducibility package for both parts of the mini-project: the Part 1 analysis script, the Part 2 detection/response script, their generated outputs, and this README.
 
@@ -21,7 +28,7 @@ output/
     max_auth_exceeded_by_ip.csv
     preauth_connections_closed_by_ip.csv
     sudo_commands_by_user.csv
-    alerts.csv               # Part 2: CRITICAL/HIGH alerts
+    alerts.csv               
   figures/
     top_source_ips_failed.png
     top_targeted_usernames.png
