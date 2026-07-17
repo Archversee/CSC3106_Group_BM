@@ -1,0 +1,9 @@
+severity,source_ip,username,reason,prior_failed_attempts_same_user,success_timestamp,minutes_since_last_failed_attempt,failed_attempts,distinct_accounts_targeted
+CRITICAL,203.0.113.48,postgres,dictionary-attacking source IP achieved a successful login for a targeted account,66.0,2026-07-10 23:41:12,298.4,,
+HIGH,203.0.113.45,,"dictionary/scanning attacker (guessed non-existent accounts), no confirmed success yet",,,,661.0,11.0
+HIGH,198.51.100.61,,"dictionary/scanning attacker (guessed non-existent accounts), no confirmed success yet",,,,694.0,11.0
+HIGH,203.0.113.47,,"dictionary/scanning attacker (guessed non-existent accounts), no confirmed success yet",,,,680.0,11.0
+HIGH,198.51.100.60,,"dictionary/scanning attacker (guessed non-existent accounts), no confirmed success yet",,,,705.0,11.0
+HIGH,203.0.113.49,,"dictionary/scanning attacker (guessed non-existent accounts), no confirmed success yet",,,,673.0,11.0
+HIGH,203.0.113.46,,"dictionary/scanning attacker (guessed non-existent accounts), no confirmed success yet",,,,696.0,11.0
+HIGH,198.51.100.62,,"dictionary/scanning attacker (guessed non-existent accounts), no confirmed success yet",,,,720.0,11.0
